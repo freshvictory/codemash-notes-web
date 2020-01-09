@@ -50,7 +50,7 @@ deleteNote m id =
 
 baseUrl : String
 baseUrl =
-    "http://localhost:8080/api/notes/"
+    "https://swift-notes-api.herokuapp.com/api/notes/"
 
 
 noteDecoder : Decoder Note
