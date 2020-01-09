@@ -17,7 +17,7 @@ type alias Note =
 getNotes : (Result Http.Error (List Note) -> msg) -> Cmd msg
 getNotes m =
     Http.get
-        { url = "http://localhost:8080/api/notes"
+        { url = "https://swift-notes-api.herokuapp.com/api/notes"
         , expect = Http.expectJson m (Json.Decode.list noteDecoder)
         }
 
@@ -25,7 +25,7 @@ getNotes m =
 saveNote : (Result Http.Error Note -> msg) -> Note -> Cmd msg
 saveNote m note =
     put
-        { url = "http://localhost:8080/api/notes/" ++ String.fromInt note.id
+        { url = "https://swift-notes-api.herokuapp.com/api/notes/" ++ String.fromInt note.id
         , body = Http.jsonBody (noteEncoder note)
         , expect = Http.expectJson m noteDecoder
         }
@@ -34,7 +34,7 @@ saveNote m note =
 deleteNote : (Result Http.Error () -> msg) -> Int -> Cmd msg
 deleteNote m id =
     delete
-        { url = "http://localhost:8080/api/notes/" ++ String.fromInt id
+        { url = "https://swift-notes-api.herokuapp.com/api/notes/" ++ String.fromInt id
         , expect = Http.expectWhatever m
         }
     
