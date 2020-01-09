@@ -1,4 +1,4 @@
-module Api exposing (Note, getNotes, saveNote, deleteNote)
+module Api exposing (Note, addNote, deleteNote, getNotes, saveNote)
 
 import Http
 import Json.Decode exposing (Decoder, field)
@@ -17,15 +17,24 @@ type alias Note =
 getNotes : (Result Http.Error (List Note) -> msg) -> Cmd msg
 getNotes m =
     Http.get
-        { url = "https://swift-notes-api.herokuapp.com/api/notes"
+        { url = baseUrl
         , expect = Http.expectJson m (Json.Decode.list noteDecoder)
+        }
+
+
+addNote : (Result Http.Error Note -> msg) -> Note -> Cmd msg
+addNote m note =
+    Http.post
+        { url = baseUrl
+        , body = Http.jsonBody (noteEncoder note)
+        , expect = Http.expectJson m noteDecoder
         }
 
 
 saveNote : (Result Http.Error Note -> msg) -> Note -> Cmd msg
 saveNote m note =
     put
-        { url = "https://swift-notes-api.herokuapp.com/api/notes/" ++ String.fromInt note.id
+        { url = baseUrl ++ String.fromInt note.id
         , body = Http.jsonBody (noteEncoder note)
         , expect = Http.expectJson m noteDecoder
         }
@@ -34,10 +43,14 @@ saveNote m note =
 deleteNote : (Result Http.Error () -> msg) -> Int -> Cmd msg
 deleteNote m id =
     delete
-        { url = "https://swift-notes-api.herokuapp.com/api/notes/" ++ String.fromInt id
+        { url = baseUrl ++ String.fromInt id
         , expect = Http.expectWhatever m
         }
-    
+
+
+baseUrl : String
+baseUrl =
+    "http://localhost:8080/api/notes/"
 
 
 noteDecoder : Decoder Note
@@ -53,8 +66,7 @@ noteDecoder =
 noteEncoder : Note -> Json.Encode.Value
 noteEncoder note =
     Json.Encode.object
-        [ ( "id", Json.Encode.int note.id )
-        , ( "title", Json.Encode.string note.title )
+        [ ( "title", Json.Encode.string note.title )
         , ( "presenter", Json.Encode.string note.presenter )
         , ( "rating", Json.Encode.int note.rating )
         , ( "notes", Json.Encode.string note.note )
